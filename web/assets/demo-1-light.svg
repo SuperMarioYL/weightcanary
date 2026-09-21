@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="349" viewBox="0 0 1160 349" role="img" aria-labelledby="demo-1-light-title demo-1-light-desc" data-palette="56e6a3-6adee7-acf6b9-561347e4092b">
+<title id="demo-1-light-title">Recorded demo — weightcanary init</title><desc id="demo-1-light-desc">Actual output of `weightcanary init` recorded on 2026-09-21.</desc>
+<rect width="1160" height="349" fill="#f3fdf9"/>
+<rect x="0" y="0" width="1160" height="46" fill="#f7fefa"/>
+<circle cx="26" cy="23" r="6" fill="#3c7d83" opacity=".85"/>
+<circle cx="48" cy="23" r="6" fill="#31825c" opacity=".85"/>
+<circle cx="70" cy="23" r="6" fill="#557a7a" opacity=".7"/>
+<text x="1136" y="28" text-anchor="end" font-size="12.5" font-family="ui-monospace,Consolas,monospace" fill="#557a7a">weightcanary init</text>
+<text x="46" y="116" font-size="14.5" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">wrote models.yaml with the default watchlist:</text>
+<text x="46" y="139" font-size="14.5" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26"></text>
+<text x="46" y="162" font-size="14.5" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  deepseek-ai/DeepSeek-V3.1</text>
+<text x="46" y="185" font-size="14.5" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  Qwen/Qwen3-235B-A22B</text>
+<text x="46" y="208" font-size="14.5" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  zai-org/GLM-4.5            (ModelScope id: ZhipuAI/GLM-4.5)</text>
+<text x="46" y="231" font-size="14.5" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26"></text>
+<text x="46" y="254" font-size="14.5" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">Edit it to add or remove models, then run:</text>
+<text x="46" y="277" font-size="14.5" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26"></text>
+<text x="46" y="300" font-size="14.5" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  weightcanary watch</text>
+<rect x="0" y="348" width="1160" height="1" fill="#cbf7e3"/>
+</svg>

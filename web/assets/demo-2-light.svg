@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="510" viewBox="0 0 1160 510" role="img" aria-labelledby="demo-2-light-title demo-2-light-desc" data-palette="56e6a3-6adee7-acf6b9-561347e4092b">
+<title id="demo-2-light-title">Recorded demo — weightcanary watch</title><desc id="demo-2-light-desc">Actual output of `weightcanary watch` recorded on 2026-09-21.</desc>
+<rect width="1160" height="510" fill="#f3fdf9"/>
+<rect x="0" y="0" width="1160" height="46" fill="#f7fefa"/>
+<circle cx="26" cy="23" r="6" fill="#3c7d83" opacity=".85"/>
+<circle cx="48" cy="23" r="6" fill="#31825c" opacity=".85"/>
+<circle cx="70" cy="23" r="6" fill="#557a7a" opacity=".7"/>
+<text x="1136" y="28" text-anchor="end" font-size="12.5" font-family="ui-monospace,Consolas,monospace" fill="#557a7a">weightcanary watch</text>
+<text x="46" y="116" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#31825c">weightcanary report — 3 model(s) — generated 2026-09-21T00:12:42Z</text>
+<text x="46" y="139" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26"></text>
+<text x="46" y="162" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">deepseek-ai/DeepSeek-V3.1</text>
+<text x="46" y="185" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  huggingface  ok     177 files  641.3 GiB  commit c0781d0</text>
+<text x="46" y="208" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  gitee        error  0 files    0 B        gitee: HTTP 403 fetching hf-models/DeepSeek-V3.1 — rate limited; set GITEE_TOKEN for higher limits</text>
+<text x="46" y="231" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  modelscope   ok     178 files  641.3 GiB  divergent: 3 changed, +1 extra on mirror</text>
+<text x="46" y="254" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26"></text>
+<text x="46" y="277" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">Qwen/Qwen3-235B-A22B</text>
+<text x="46" y="300" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  huggingface  ok     128 files  437.9 GiB  commit 8efa617</text>
+<text x="46" y="323" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  gitee        error  0 files    0 B        gitee: HTTP 403 fetching hf-models/Qwen3-235B-A22B — rate limited; set GITEE_TOKEN for higher limits</text>
+<text x="46" y="346" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  modelscope   ok     129 files  437.9 GiB  divergent: 1 changed, +1 extra on mirror</text>
+<text x="46" y="369" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26"></text>
+<text x="46" y="392" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">zai-org/GLM-4.5</text>
+<text x="46" y="415" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  huggingface  ok     101 files  667.5 GiB  commit cbb2c7c</text>
+<text x="46" y="438" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  gitee        error  0 files    0 B        gitee: HTTP 403 fetching hf-models/GLM-4.5 — rate limited; set GITEE_TOKEN for higher limits</text>
+<text x="46" y="461" font-size="12.4" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#132a26">  modelscope   ok     102 files  667.5 GiB  divergent: 1 changed, +1 extra on mirror</text>
+<rect x="0" y="509" width="1160" height="1" fill="#cbf7e3"/>
+</svg>

@@ -1,0 +1,38 @@
+{
+  "mode": "auto",
+  "id": "56e6a3-6adee7-acf6b9-561347e4092b",
+  "identity": "https://github.com/supermarioyl/weightcanary",
+  "primary": "#56e6a3",
+  "secondary": "#6adee7",
+  "highlight": "#acf6b9",
+  "dark": {
+    "bg": "#050c0f",
+    "panel": "#0c171b",
+    "code": "#0a1718",
+    "ink": "#eefdf1",
+    "muted": "#95b9b7",
+    "line": "#173c30",
+    "primary": "#56e6a3",
+    "secondary": "#6adee7",
+    "highlight": "#acf6b9",
+    "accent": "#56e6a3",
+    "buttonStart": "#32855f",
+    "buttonEnd": "#3d8086",
+    "buttonText": "#ffffff"
+  },
+  "light": {
+    "bg": "#f9fefc",
+    "panel": "#f7fefa",
+    "code": "#f3fdf9",
+    "ink": "#132a26",
+    "muted": "#557a7a",
+    "line": "#cbf7e3",
+    "primary": "#31825c",
+    "secondary": "#3c7d83",
+    "highlight": "#577c5e",
+    "accent": "#31825c",
+    "buttonStart": "#32855f",
+    "buttonEnd": "#3d8086",
+    "buttonText": "#ffffff"
+  }
+}

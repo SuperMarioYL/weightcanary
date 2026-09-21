@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="165" viewBox="0 0 1160 165" role="img" aria-labelledby="demo-0-light-title demo-0-light-desc" data-palette="56e6a3-6adee7-acf6b9-561347e4092b">
+<title id="demo-0-light-title">Recorded demo — weightcanary --version</title><desc id="demo-0-light-desc">Actual output of `weightcanary --version` recorded on 2026-09-21.</desc>
+<rect width="1160" height="165" fill="#f3fdf9"/>
+<rect x="0" y="0" width="1160" height="46" fill="#f7fefa"/>
+<circle cx="26" cy="23" r="6" fill="#3c7d83" opacity=".85"/>
+<circle cx="48" cy="23" r="6" fill="#31825c" opacity=".85"/>
+<circle cx="70" cy="23" r="6" fill="#557a7a" opacity=".7"/>
+<text x="1136" y="28" text-anchor="end" font-size="12.5" font-family="ui-monospace,Consolas,monospace" fill="#557a7a">weightcanary --version</text>
+<text x="46" y="116" font-size="14.5" xml:space="preserve" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" fill="#31825c">weightcanary version 0.1.0</text>
+<rect x="0" y="164" width="1160" height="1" fill="#cbf7e3"/>
+</svg>

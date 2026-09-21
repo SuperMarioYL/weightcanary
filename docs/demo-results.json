@@ -1,0 +1,55 @@
+{
+  "recorded_at": "2026-09-21",
+  "implementation_version": "0.1.0",
+  "source_revision": "v0.1.0",
+  "environment": "go1.24.1 darwin/arm64; live network reads against huggingface.co, modelscope.cn and gitee.com",
+  "scope": [
+    "The happy path was executed for real: weightcanary init wrote the pre-filled watchlist, weightcanary watch snapshotted the three default models across Hugging Face and ModelScope (and Gitee where the anonymous API budget allowed) and wrote state.json.",
+    "The full run took about 43 seconds end to end (the Gitee poller spaces its requests to stay under the anonymous rate limit).",
+    "The divergence numbers below come from comparing the live HF and ModelScope listings within one run; they will drift as the registries change, which is the point of the tool."
+  ],
+  "steps": [
+    {
+      "label": "Version",
+      "status": "executed",
+      "command": "weightcanary --version",
+      "output": "weightcanary version 0.1.0"
+    },
+    {
+      "label": "Init the watchlist",
+      "status": "executed",
+      "command": "weightcanary init",
+      "output": "wrote models.yaml with the default watchlist:\n\n  deepseek-ai/DeepSeek-V3.1\n  Qwen/Qwen3-235B-A22B\n  zai-org/GLM-4.5            (ModelScope id: ZhipuAI/GLM-4.5)\n\nEdit it to add or remove models, then run:\n\n  weightcanary watch",
+      "output_summary": {
+        "artifacts_written": ["models.yaml pre-filled with the three default models and their per-registry mirror ids"]
+      }
+    },
+    {
+      "label": "Watch: snapshot and report",
+      "status": "executed",
+      "command": "weightcanary watch",
+      "output": "weightcanary report — 3 model(s) — generated 2026-09-21T00:12:42Z\n\ndeepseek-ai/DeepSeek-V3.1\n  huggingface  ok     177 files  641.3 GiB  commit c0781d0\n  gitee        error  0 files    0 B        gitee: HTTP 403 fetching hf-models/DeepSeek-V3.1 — rate limited; set GITEE_TOKEN for higher limits\n  modelscope   ok     178 files  641.3 GiB  divergent: 3 changed, +1 extra on mirror\n\nQwen/Qwen3-235B-A22B\n  huggingface  ok     128 files  437.9 GiB  commit 8efa617\n  gitee        error  0 files    0 B        gitee: HTTP 403 fetching hf-models/Qwen3-235B-A22B — rate limited; set GITEE_TOKEN for higher limits\n  modelscope   ok     129 files  437.9 GiB  divergent: 1 changed, +1 extra on mirror\n\nzai-org/GLM-4.5\n  huggingface  ok     101 files  667.5 GiB  commit cbb2c7c\n  gitee        error  0 files    0 B        gitee: HTTP 403 fetching hf-models/GLM-4.5 — rate limited; set GITEE_TOKEN for higher limits\n  modelscope   ok     102 files  667.5 GiB  divergent: 1 changed, +1 extra on mirror",
+      "output_summary": {
+        "models": 3,
+        "huggingface": "all three repos present; per-file size and lfs sha256 recorded",
+        "modelscope": "all three mirrors present; HF-vs-ModelScope divergence computed from file set + size + lfs sha256",
+        "gitee": "the anonymous Gitee API budget was exhausted earlier the same hour, so the mirror rows surface the rate limit as an error instead of a fake result; with GITEE_TOKEN or a fresh window these rows complete",
+        "deepseek_divergence_detail": ".gitattributes 1519->2127 bytes, LICENSE 1084->1064, README.md 11340->11296, plus one mirror-only configuration.json — the weight shards and their LFS sha256 match exactly. Same-size files that ModelScope stores as LFS while HF keeps as plain git (tokenizer.json, the weight index) are deliberately not counted as divergence.",
+        "state_json": "state.json written (~175 KiB, one AvailabilityRecord per model with per-file size and lfs_sha256), suitable for git commit as the audit ledger"
+      }
+    }
+  ],
+  "not_executed": {
+    "feature": "change alerts (takedown / mirror-divergence notifications via Feishu, DingTalk, generic webhook)",
+    "status": "not_implemented_m2",
+    "note": "v0.1 is the m1 milestone: snapshot + report + state.json ledger. The run-to-run diff engine and the notifiers are stubs (internal/diff, internal/notify) and their Feishu/DingTalk card payloads are unverified until a live bot send confirms them."
+  },
+  "limitations": [
+    "Anonymous Gitee API calls are aggressively rate-limited; decoding the LFS pointers of a large mirror (over a hundred weight shards) can exhaust the budget mid-run. The poller spaces and backs off its requests, marks incomplete listings as partial, and surfaces hard rate limits as error rows — it never presents a half-checked mirror as divergent. Set GITEE_TOKEN for reliable full runs.",
+    "ModelScope does not expose a repo-level commit sha through the public files endpoint, so mirror freshness is judged by file set + size + lfs sha256, not by commit gating (Hugging Face rows do carry the commit sha).",
+    "Hugging Face answers HTTP 401, not 404, for missing or gated repos; both are reported as absent. Set HF_TOKEN to watch gated repos you have access to.",
+    "The HF API poller talks to huggingface.co directly. hf-mirror.com only mirrors the /resolve/ download URLs (its /api/* is geo-dependently redirected) and is therefore not usable as an API fallback; that behavior is geo-dependent and was not verified in this build.",
+    "Feishu/DingTalk alert card payloads are unverified in v0.1 (they need real bot tokens to confirm); alert delivery itself lands with the m2 milestone.",
+    "Only file presence, size and lfs sha256 are compared. Weight bytes are never downloaded; WeightCanary monitors, it does not mirror."
+  ]
+}

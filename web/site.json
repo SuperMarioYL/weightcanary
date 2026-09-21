@@ -1,0 +1,318 @@
+{
+  "schema": 3,
+  "name": "WeightCanary",
+  "github": "https://github.com/SuperMarioYL/weightcanary",
+  "palette": "auto",
+  "lang": {
+    "primary": "zh",
+    "toggle": true
+  },
+  "meta": {
+    "visual_style": "neon-particle",
+    "content_baseline": "docs/demo-results.json",
+    "demo_source": "docs/demo-results.json",
+    "content_version": "1",
+    "source_version": "v0.1.0"
+  },
+  "hero": {
+    "eyebrow": {
+      "zh": "命令行可用性监控 · 无服务端 · 无账号",
+      "en": "A CLI availability monitor · no server · no account"
+    },
+    "headline": {
+      "zh": "权重的可用性，\n断供之前先知道",
+      "en": "Know that your weights\nare still there — before they aren't"
+    },
+    "sub": {
+      "zh": "WeightCanary 盯守你 pin 在生产环境里的开源权重：Hugging Face 是否还在、ModelScope/Gitee 镜像是否与源站分歧，每一轮快照都落进可提交的 state.json——git 历史就是审计账本。一条命令，一个静态二进制。",
+      "en": "WeightCanary watches the open weights you pinned in production: are they still on Hugging Face, have the ModelScope/Gitee mirrors diverged from the source — and every run lands in a commit-friendly state.json, so git history doubles as the audit ledger. One command, one static binary."
+    },
+    "href": "#quickstart",
+    "cta": { "zh": "开始使用", "en": "Get started" },
+    "ctaGithub": { "zh": "在 GitHub 查看", "en": "View on GitHub" }
+  },
+  "advantages": [
+    {
+      "title": {
+        "zh": "镜像层是没人盯的盲区",
+        "en": "The mirror layer is an unwatched blind spot"
+      },
+      "body": {
+        "zh": "国内团队拉 DeepSeek / Qwen / GLM 走 ModelScope 和 Gitee，这两层与 Hugging Face 之间的滞后与分歧不可见——镜像站为吞吐而生，不会公布自己的滞后。WeightCanary 逐文件对比文件集、size 和 LFS sha256，把「镜像少了什么」在报告里摆到明面上。",
+        "en": "CN teams pull DeepSeek / Qwen / GLM weights through ModelScope and Gitee. The lag and divergence between those mirrors and Hugging Face is invisible — mirrors exist for throughput and never advertise their own staleness. WeightCanary compares file sets, sizes and LFS sha256 values per file, and puts \"what the mirror is missing\" on the record."
+      },
+      "chips": [
+        "› Hugging Face · ModelScope · Gitee",
+        "› size + lfs sha256 逐文件对比",
+        "› in sync / divergent 明细"
+      ]
+    },
+    {
+      "title": {
+        "zh": "git 历史就是审计账本",
+        "en": "Git history is the audit ledger"
+      },
+      "body": {
+        "zh": "每轮 watch 落一份快照进 state.json：每个模型的 HF 状态、各镜像状态、逐文件 size 与 LFS sha256、抓取时间。提交进 git，「它当时还在吗」永远有答案——不需要服务端、不需要数据库、不需要账号。",
+        "en": "Every watch run writes a snapshot to state.json: per-model HF state, each mirror's state, per-file sizes and LFS sha256 values, and the check timestamps. Commit it and \"was it still there back then?\" always has an answer — no server, no database, no account."
+      },
+      "chips": [
+        "› state.json 可提交",
+        "› watch.yml 每 6 小时刷新",
+        "› 无服务端 · 无数据库"
+      ]
+    },
+    {
+      "title": {
+        "zh": "对线上 API 的诚实处理",
+        "en": "Honest handling of the live APIs"
+      },
+      "body": {
+        "zh": "Hugging Face 对缺失或 gated 仓库返回 401（不是 404），一律按「不存在」报告；ModelScope 用 HTTP 200 + Success=false 表示仓库不存在；Gitee 的 LFS 权重是 134 字节指针，真实 size 和 sha256 从指针内容解码。限流导致查不完的清单被标记为 partial，绝不冒充「已对比」。",
+        "en": "Hugging Face answers 401 (not 404) for missing or gated repos — both reported as absent. ModelScope signals a missing repo with HTTP 200 + Success=false. Gitee stores LFS weights as ~134-byte pointers whose real size and sha256 are decoded from the pointer content. Listings cut short by rate limiting are marked partial — never presented as a verified comparison."
+      },
+      "chips": [
+        "› HF 401 = absent",
+        "› Gitee 指针解码",
+        "› partial 如实标注"
+      ]
+    }
+  ],
+  "demo": {
+    "title": {
+      "zh": "录制演示",
+      "en": "Recorded demo"
+    },
+    "note": {
+      "zh": "以下命令于 2026-09-21 对三个默认模型真实执行（对 huggingface.co / modelscope.cn / gitee.com 的线上只读请求），完整记录见 docs/demo-results.json。Gitee 行在匿名限流时如实报错。",
+      "en": "The commands below ran for real on 2026-09-21 against the three default models (live read-only requests to huggingface.co / modelscope.cn / gitee.com); the full record lives in docs/demo-results.json. The Gitee row fails loudly when anonymously rate-limited."
+    },
+    "source": "https://github.com/SuperMarioYL/weightcanary/blob/main/docs/demo-results.json",
+    "steps": [
+      {
+        "label": {
+          "zh": "版本",
+          "en": "Version"
+        },
+        "body": {
+          "zh": "单个静态二进制，无运行时依赖：go install 即装即用。",
+          "en": "A single static binary with no runtime dependencies: go install and it runs."
+        },
+        "image": "/assets/demo-0-light.svg",
+        "imageDark": "/assets/demo-0-dark.svg",
+        "command": "weightcanary --version",
+        "output": "weightcanary version 0.1.0"
+      },
+      {
+        "label": {
+          "zh": "初始化盯守清单",
+          "en": "Init the watchlist"
+        },
+        "body": {
+          "zh": "init 写入预填好的盯守清单：DeepSeek-V3.1、Qwen3-235B-A22B、GLM-4.5，含各镜像站上的 id（GLM-4.5 在 ModelScope 挂在 ZhipuAI 名下）。",
+          "en": "init writes the pre-filled watchlist: DeepSeek-V3.1, Qwen3-235B-A22B and GLM-4.5, with per-mirror ids (ModelScope hosts GLM-4.5 under the ZhipuAI namespace)."
+        },
+        "image": "/assets/demo-1-light.svg",
+        "imageDark": "/assets/demo-1-dark.svg",
+        "command": "weightcanary init",
+        "output": "wrote models.yaml with the default watchlist:\n\n  deepseek-ai/DeepSeek-V3.1\n  Qwen/Qwen3-235B-A22B\n  zai-org/GLM-4.5            (ModelScope id: ZhipuAI/GLM-4.5)\n\nEdit it to add or remove models, then run:\n\n  weightcanary watch"
+      },
+      {
+        "label": {
+          "zh": "快照与可用性报告",
+          "en": "Snapshot and report"
+        },
+        "body": {
+          "zh": "watch 三站抓取后输出逐模型报告：HF 行带 commit sha 与总大小，镜像行给出 in sync / divergent 明细；state.json 落盘，提交进 git 即成审计账本。本次运行中 DeepSeek-V3.1 的权重分片与 LFS sha256 跨站一致，漂移的是 README/LICENSE/.gitattributes 与镜像多出的 configuration.json；Gitee 匿名限流如实报错。",
+          "en": "watch polls all three registries and prints the per-model report: HF rows carry the commit sha and total size, mirror rows get in sync / divergent detail; state.json lands on disk, ready to commit as the audit ledger. In this run DeepSeek-V3.1's weight shards and LFS sha256 matched across sites — what drifted was README/LICENSE/.gitattributes plus a mirror-only configuration.json, and the rate-limited Gitee row fails loudly instead of pretending."
+        },
+        "image": "/assets/demo-2-light.svg",
+        "imageDark": "/assets/demo-2-dark.svg",
+        "command": "weightcanary watch",
+        "output": "weightcanary report — 3 model(s) — generated 2026-09-21T00:12:42Z\n\ndeepseek-ai/DeepSeek-V3.1\n  huggingface  ok     177 files  641.3 GiB  commit c0781d0\n  gitee        error  0 files    0 B        gitee: HTTP 403 fetching hf-models/DeepSeek-V3.1 — rate limited; set GITEE_TOKEN for higher limits\n  modelscope   ok     178 files  641.3 GiB  divergent: 3 changed, +1 extra on mirror\n\nQwen/Qwen3-235B-A22B\n  huggingface  ok     128 files  437.9 GiB  commit 8efa617\n  gitee        error  0 files    0 B        gitee: HTTP 403 fetching hf-models/Qwen3-235B-A22B — rate limited; set GITEE_TOKEN for higher limits\n  modelscope   ok     129 files  437.9 GiB  divergent: 1 changed, +1 extra on mirror\n\nzai-org/GLM-4.5\n  huggingface  ok     101 files  667.5 GiB  commit cbb2c7c\n  gitee        error  0 files    0 B        gitee: HTTP 403 fetching hf-models/GLM-4.5 — rate limited; set GITEE_TOKEN for higher limits\n  modelscope   ok     102 files  667.5 GiB  divergent: 1 changed, +1 extra on mirror"
+      }
+    ]
+  },
+  "quickstart": {
+    "title": {
+      "zh": "快速开始",
+      "en": "Quickstart"
+    },
+    "body": {
+      "zh": "需要 Go 1.24（或直接下载 Releases 里的二进制）。第一次 watch 约 1 分钟：三站并发抓取，Gitee 大镜像在匿名限流下可能标记为 partial，设置 GITEE_TOKEN 可完整对比。",
+      "en": "Requires Go 1.24 (or grab a binary from Releases). The first watch takes about a minute: all three registries are polled concurrently, and a large Gitee mirror may be marked partial under anonymous rate limiting — set GITEE_TOKEN for a full comparison."
+    },
+    "steps": [
+      {
+        "title": {
+          "zh": "安装",
+          "en": "Install"
+        },
+        "code": "go install github.com/SuperMarioYL/weightcanary@latest\n# or grab an archive from Releases\n# (darwin/linux/windows x amd64/arm64)"
+      },
+      {
+        "title": {
+          "zh": "初始化",
+          "en": "Initialize"
+        },
+        "code": "weightcanary init"
+      },
+      {
+        "title": {
+          "zh": "第一次盯守",
+          "en": "First watch"
+        },
+        "code": "weightcanary watch"
+      },
+      {
+        "title": {
+          "zh": "提交账本",
+          "en": "Commit the ledger"
+        },
+        "code": "git add -f models.yaml && git add state.json\ngit commit -m \"start watching model availability\"\n# then commit the bundled watch.yml for hands-free refresh"
+      }
+    ]
+  },
+  "limitations": [
+    {
+      "zh": "Gitee 匿名 API 限流严格：大镜像（上百个权重分片）的逐文件指针解码可能耗尽配额，清单会标记为 partial 并在报告中明示；设置 GITEE_TOKEN 可完整对比。",
+      "en": "The anonymous Gitee API rate-limits aggressively: decoding LFS pointers for a large mirror (100+ weight shards) can exhaust the budget, and the listing is then marked partial and labeled in the report. Set GITEE_TOKEN for reliable full runs."
+    },
+    {
+      "zh": "ModelScope 的公开接口不暴露仓库级 commit sha，镜像新鲜度靠文件集 + size + LFS sha256 判定；HF 行带 commit sha。",
+      "en": "ModelScope's public endpoint does not expose a repo-level commit sha, so mirror freshness is judged by file set + size + LFS sha256; HF rows carry a commit sha."
+    },
+    {
+      "zh": "HF API 直连 huggingface.co。hf-mirror.com 只镜像 /resolve/ 下载路径，其 /api/* 行为随地区不同（本构建未验证），不能作为 API 层的降级通道。",
+      "en": "The HF poller talks to huggingface.co directly. hf-mirror.com only mirrors the /resolve/ download paths; its /api/* behavior is geo-dependent (not verified in this build) and cannot serve as an API-level fallback."
+    },
+    {
+      "zh": "v0.1 只盯元数据：文件清单、size、LFS sha256，从不下载权重本体；自动告警（飞书 / 钉钉 / Webhook）属于 m2，当前请用 git 对比 state.json 查看两轮之间的变化。",
+      "en": "v0.1 watches metadata only — file listings, sizes and LFS sha256 — never the weight bytes. Automatic alerts (Feishu / DingTalk / Webhook) belong to m2; until then, diff state.json in git to see what changed between runs."
+    }
+  ],
+  "scene": {
+    "kind": "neon-graph",
+    "caption": {
+      "zh": "示意场景：三个 registry 的快照流入金丝雀，落进可提交的账本；确切数字以下方录制演示为准。",
+      "en": "Illustrative scene: snapshots from three registries flow into the canary and land in the commit-friendly ledger; exact counts belong to the recorded demo below."
+    },
+    "fallback": "/assets/scene-dark.svg",
+    "fallbackLight": "/assets/scene-light.svg"
+  },
+  "story": {
+    "intro": {
+      "title": {
+        "zh": "从一次悄悄的 404 开始",
+        "en": "It starts with a quiet 404"
+      },
+      "body": {
+        "zh": "你把 DeepSeek-V3.1 或 GLM-4.5 pin 在生产环境里，权重从 Hugging Face 拉取，国内走 ModelScope 或 Gitee。某天构建突然失败——不是代码变了，不是依赖变了，是权重文件消失了。而这一天之前，没有任何工具告诉过你。",
+        "en": "You pinned DeepSeek-V3.1 or GLM-4.5 in production; the weights come from Hugging Face, or from ModelScope/Gitee closer to home. One day the build fails — not your code, not your dependencies: the weight file is gone. And nothing warned you beforehand."
+      }
+    },
+    "sections": [
+      {
+        "title": {
+          "zh": "盯守流程：一条命令一轮快照",
+          "en": "The watch loop: one command, one snapshot"
+        },
+        "body": {
+          "zh": "models.yaml 列出要盯的模型与各镜像站的 id；watch 并发抓取三个 registry，逐文件记录 presence、size 与 LFS sha256，落进 state.json 并在终端打印报告。没变的文件保持安静，漂移的文件给出明细。",
+          "en": "models.yaml lists the models and their per-mirror ids; watch polls the three registries concurrently, records per-file presence, size and LFS sha256, lands it all in state.json and prints the report. Unchanged files stay quiet; drifted ones get their detail printed."
+        },
+        "image": {
+          "light": "/assets/process-light.svg",
+          "dark": "/assets/process-dark.svg",
+          "alt": {
+            "zh": "从 models.yaml 到三站快照、账本与报告的盯守流程",
+            "en": "The watch flow from models.yaml to snapshots, the ledger and the report"
+          },
+          "mobile": {
+            "light": "/assets/process-mobile-light.svg",
+            "dark": "/assets/process-mobile-dark.svg"
+          }
+        }
+      },
+      {
+        "title": {
+          "zh": "单进程二进制的工作原理",
+          "en": "How the single-process binary works"
+        },
+        "body": {
+          "zh": "poller 对每个 registry 只发只读 REST 请求：HF 的 /api/models 与 /tree（size + lfs.oid sha256）、ModelScope 的 /repo/files（Sha256 与 HF lfs.oid 一致）、Gitee 的 git trees 加逐文件指针解码。state 把每轮快照写进可提交的 JSON；report 渲染对比表。诚实退化：限流截断的清单标记 partial，绝不冒充已对比。",
+          "en": "The poller sends read-only REST requests only: HF's /api/models and /tree (size + lfs.oid sha256), ModelScope's /repo/files (whose Sha256 matches HF's lfs.oid), and Gitee's git trees plus per-file pointer decoding. state writes every snapshot into a commit-friendly JSON; report renders the comparison table. Honest degradation: listings cut short by rate limiting are marked partial, never presented as verified."
+        },
+        "image": {
+          "light": "/assets/architecture-light.svg",
+          "dark": "/assets/architecture-dark.svg",
+          "alt": {
+            "zh": "WeightCanary 单进程架构：三个 registry 源进入 poller/state/report",
+            "en": "WeightCanary's single-process architecture: three registry sources into poller/state/report"
+          },
+          "mobile": {
+            "light": "/assets/architecture-mobile-light.svg",
+            "dark": "/assets/architecture-mobile-dark.svg"
+          }
+        }
+      },
+      {
+        "title": {
+          "zh": "输入、输出与集成",
+          "en": "Inputs, outputs and integrations"
+        },
+        "body": {
+          "zh": "输入是 models.yaml 盯守清单与两个可选环境变量（HF_TOKEN 读 gated 仓库、GITEE_TOKEN 提高限流配额）。输出是终端报告与 state.json 账本——提交进 git，历史即审计。定时刷新用仓库自带的 watch.yml；飞书 / 钉钉 / Webhook 告警路由在 m2 接入。",
+          "en": "The input is the models.yaml watchlist plus two optional environment variables (HF_TOKEN for gated repos, GITEE_TOKEN for higher rate limits). The outputs are the terminal report and the state.json ledger — commit it and history is the audit trail. Scheduled refresh ships as the bundled watch.yml; Feishu / DingTalk / Webhook alert routing lands in m2."
+        },
+        "image": {
+          "light": "/assets/integrations-light.svg",
+          "dark": "/assets/integrations-dark.svg",
+          "alt": {
+            "zh": "三个 registry、账本输出与 m2 告警路由的集成视图",
+            "en": "Integration view: three registries, the ledger output and the m2 alert routing"
+          },
+          "mobile": {
+            "light": "/assets/integrations-mobile-light.svg",
+            "dark": "/assets/integrations-mobile-dark.svg"
+          }
+        }
+      }
+    ],
+    "details": [
+      {
+        "title": {
+          "zh": "配置：models.yaml",
+          "en": "Configuration: models.yaml"
+        },
+        "body": {
+          "zh": "由 weightcanary init 生成；每个条目以 HF id 为主键，mirrors 按站填 id——同一个模型在不同站的 id 可能不同（GLM-4.5 在 ModelScope 是 ZhipuAI/GLM-4.5）。不填某站就不盯该站。",
+          "en": "Written by weightcanary init; each entry is keyed by the HF id, and mirrors maps each site to its local id — the same model can live under different ids per site (ModelScope hosts GLM-4.5 as ZhipuAI/GLM-4.5). Omit a site and it is not watched."
+        },
+        "code": "models:\n  - id: deepseek-ai/DeepSeek-V3.1\n    mirrors:\n      modelscope: deepseek-ai/DeepSeek-V3.1\n      gitee: hf-models/DeepSeek-V3.1\n  - id: zai-org/GLM-4.5\n    mirrors:\n      modelscope: ZhipuAI/GLM-4.5\n      gitee: hf-models/GLM-4.5"
+      },
+      {
+        "title": {
+          "zh": "state.json 账本",
+          "en": "The state.json ledger"
+        },
+        "body": {
+          "zh": "每个模型一条 AvailabilityRecord：HF 状态（含 commit sha）、各镜像状态、逐文件 size 与 lfs_sha256、抓取时间。它是普通 JSON——提交进 git，任何一次「它当时还在吗」都有答案；两轮之间的 diff 就是变更清单。",
+          "en": "One AvailabilityRecord per model: the HF state (with commit sha), each mirror's state, per-file sizes and lfs_sha256 values, and the check timestamps. Plain JSON — commit it, and \"was it still there back then?\" always has an answer; the diff between two runs is the change list."
+        },
+        "code": "{\n  \"version\": 1,\n  \"generated_at\": \"2026-09-21T00:12:42Z\",\n  \"models\": [\n    {\n      \"model_id\": \"deepseek-ai/DeepSeek-V3.1\",\n      \"hf\":      { \"present\": true, \"commit_sha\": \"c0781d0…\" },\n      \"mirrors\": { \"modelscope\": { \"present\": true } }\n    }\n  ]\n}"
+      },
+      {
+        "title": {
+          "zh": "命令一览",
+          "en": "Commands"
+        },
+        "body": {
+          "zh": "三个子命令覆盖初始化、盯守与重渲染；定时刷新交给仓库自带的 watch.yml。",
+          "en": "Three subcommands cover init, watch and re-rendering; scheduled refresh ships as the bundled watch.yml."
+        },
+        "code": "weightcanary init\nweightcanary watch [-c models.yaml] [-s state.json] [--files]\nweightcanary report [-s state.json] [--files]"
+      }
+    ]
+  }
+}
