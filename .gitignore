@@ -1,0 +1,25 @@
+# local user watchlist (models.example.yaml is the tracked template)
+models.yaml
+
+# build output
+/weightcanary
+/weightcanary.exe
+dist/
+state.json.tmp
+
+# build scratch
+PUBLISH_BLOCKED.md
+BUILD_SETUP_NEXT_STEPS.md
+_spawn*
+.spawn.*
+.builder_*
+.build_metadata*
+_build_ctx*
+.stage_*
+
+# assistant config
+.claude/
+CLAUDE.md
+
+# editor and OS noise
+.DS_Store
