@@ -19,3 +19,6 @@ _build_ctx*
 
 # editor and OS noise
 .DS_Store
+_build_ctx.json
+.test_report*
+.eval_report*
