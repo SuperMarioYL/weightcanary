@@ -1,0 +1,7 @@
+# Minimal watchlist: one model, one mirror.
+# Run it from the repo root with:
+#   weightcanary watch --config examples/models.minimal.yaml
+models:
+  - id: deepseek-ai/DeepSeek-V3.1
+    mirrors:
+      modelscope: deepseek-ai/DeepSeek-V3.1
