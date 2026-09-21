@@ -171,4 +171,4 @@ Once a team receives its first real alert from the free CLI, pasting `models.yam
 
 ## License
 
-<p align="center"><sub><a href="./LICENSE">MIT</a> © 2026 SuperMarioYL</sub></p>
+<p align="center"><sub><a href="./LICENSE">MIT</a> © 2026 WeightCanary contributors</sub></p>

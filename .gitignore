@@ -17,9 +17,5 @@ _spawn*
 _build_ctx*
 .stage_*
 
-# assistant config
-.claude/
-CLAUDE.md
-
 # editor and OS noise
 .DS_Store

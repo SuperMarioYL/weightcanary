@@ -171,4 +171,4 @@ CLI 免费开源，本仓库的全部功能（快照、对比、账本、定时 
 
 ## License
 
-<p align="center"><sub><a href="./LICENSE">MIT</a> © 2026 SuperMarioYL</sub></p>
+<p align="center"><sub><a href="./LICENSE">MIT</a> © 2026 WeightCanary contributors</sub></p>

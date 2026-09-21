@@ -93,9 +93,16 @@ func pollModel(ctx context.Context, m config.ModelConfig, hf registry.Poller, po
 		CheckedAt: time.Now().UTC(),
 	}
 	rec.HF = snapshotWith(ctx, hf, m.ID)
+	// A mirror left out of models.yaml is simply not watched (see README):
+	// skip it instead of polling with an empty repo id, and leave the record
+	// unset so the report renders no row for that site.
 	for _, key := range config.MirrorKeys {
+		repoID, ok := m.Mirrors[key]
+		if !ok || repoID == "" {
+			continue
+		}
 		// pollers covers every key in config.MirrorKeys by construction.
-		rec.Mirrors[key] = snapshotWith(ctx, pollers[key], m.Mirrors[key])
+		rec.Mirrors[key] = snapshotWith(ctx, pollers[key], repoID)
 	}
 	return rec
 }
