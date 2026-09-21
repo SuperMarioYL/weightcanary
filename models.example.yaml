@@ -1,0 +1,20 @@
+# WeightCanary watchlist.
+# Each entry is keyed by the Hugging Face model id; "mirrors" maps a registry
+# name to the repo id on that registry. Ids differ per registry — ModelScope
+# hosts GLM-4.5 as ZhipuAI/GLM-4.5, and the Gitee mirrors sit under the
+# "Hugging Face 模型镜像" org (hf-models).
+models:
+  - id: deepseek-ai/DeepSeek-V3.1
+    mirrors:
+      modelscope: deepseek-ai/DeepSeek-V3.1
+      gitee: hf-models/DeepSeek-V3.1
+
+  - id: Qwen/Qwen3-235B-A22B
+    mirrors:
+      modelscope: Qwen/Qwen3-235B-A22B
+      gitee: hf-models/Qwen3-235B-A22B
+
+  - id: zai-org/GLM-4.5
+    mirrors:
+      modelscope: ZhipuAI/GLM-4.5
+      gitee: hf-models/GLM-4.5
