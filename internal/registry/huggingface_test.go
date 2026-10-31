@@ -52,6 +52,54 @@ func TestHuggingFaceSnapshot(t *testing.T) {
 	}
 }
 
+func TestHuggingFaceTreePaginationFollowed(t *testing.T) {
+	// The tree API paginates at 1000 entries per page and hands back the next
+	// page as a Link rel="next" header. The poller must follow it, or repos
+	// with more files than one page silently record a truncated ledger.
+	var srv *httptest.Server
+	srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.URL.Path != "/api/models/a/b/tree/s1" {
+			w.Write([]byte(`{"sha":"s1"}`))
+			return
+		}
+		switch r.URL.Query().Get("cursor") {
+		case "":
+			w.Header().Set("Link", `<`+srv.URL+`/api/models/a/b/tree/s1?cursor=p2>; rel="next"`)
+			w.Write([]byte(`[
+				{"type":"file","oid":"a1","size":10,"path":"page1-file-a"},
+				{"type":"file","oid":"a2","size":20,"path":"page1-file-b"}
+			]`))
+		case "p2":
+			w.Write([]byte(`[
+				{"type":"file","oid":"b1","size":30,"path":"page2-file-c"}
+			]`))
+		default:
+			t.Errorf("unexpected cursor %q", r.URL.Query().Get("cursor"))
+			http.NotFound(w, r)
+		}
+	}))
+	defer srv.Close()
+
+	hf := &HuggingFace{BaseURL: srv.URL, Client: srv.Client()}
+	st, err := hf.Snapshot(context.Background(), "a/b")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !st.Present {
+		t.Fatalf("state = %+v", st)
+	}
+	for _, path := range []string{"page1-file-a", "page1-file-b", "page2-file-c"} {
+		f, ok := st.Files[path]
+		if !ok {
+			t.Fatalf("file %q missing from the ledger — a page was dropped", path)
+		}
+		if !f.Present {
+			t.Fatalf("file %q = %+v", path, f)
+		}
+	}
+}
+
 func TestHuggingFaceMissingRepoIsAbsent(t *testing.T) {
 	// HF answers 401, not 404, for a missing or gated repo; both mean absent.
 	for _, code := range []int{http.StatusUnauthorized, http.StatusNotFound} {

@@ -88,13 +88,20 @@ func (g *Gitee) Snapshot(ctx context.Context, repoID string) (state.RegistryStat
 		DefaultBranch string `json:"default_branch"`
 	}
 	g.throttle()
-	code, err := getJSON(ctx, g.Client, g.authed(g.BaseURL+"/repos/"+repoID), "", &repo)
+	_, code, err := getJSON(ctx, g.Client, g.authed(g.BaseURL+"/repos/"+repoID), "", &repo)
 	g.backOff(code)
 	if err != nil {
 		return st, fmt.Errorf("gitee: %w", err)
 	}
-	if code == http.StatusNotFound || code == http.StatusUnauthorized {
+	if code == http.StatusNotFound {
 		return st, nil
+	}
+	if code == http.StatusUnauthorized {
+		// On Gitee 401 means the access token was rejected, not that the repo
+		// is gone (a live public repo answers 200 anonymously, 401 with a
+		// bogus token). A stale GITEE_TOKEN must surface as an error row, or
+		// every watched repo silently reads as a takedown.
+		return st, fmt.Errorf("gitee: HTTP 401 fetching %s — the access token was rejected; check GITEE_TOKEN", repoID)
 	}
 	if code == http.StatusForbidden {
 		return st, fmt.Errorf("gitee: HTTP 403 fetching %s — rate limited; set GITEE_TOKEN for higher limits", repoID)
@@ -113,7 +120,7 @@ func (g *Gitee) Snapshot(ctx context.Context, repoID string) (state.RegistryStat
 		} `json:"commit"`
 	}
 	g.throttle()
-	code, err = getJSON(ctx, g.Client, g.authed(g.BaseURL+"/repos/"+repoID+"/branches/"+branch), "", &head)
+	_, code, err = getJSON(ctx, g.Client, g.authed(g.BaseURL+"/repos/"+repoID+"/branches/"+branch), "", &head)
 	g.backOff(code)
 	if err != nil {
 		return st, fmt.Errorf("gitee: %w", err)
@@ -131,7 +138,7 @@ func (g *Gitee) Snapshot(ctx context.Context, repoID string) (state.RegistryStat
 	}
 	treeURL := fmt.Sprintf("%s/repos/%s/git/trees/%s?recursive=1", g.BaseURL, repoID, branch)
 	g.throttle()
-	code, err = getJSON(ctx, g.Client, g.authed(treeURL), "", &tree)
+	_, code, err = getJSON(ctx, g.Client, g.authed(treeURL), "", &tree)
 	g.backOff(code)
 	if err != nil {
 		return st, fmt.Errorf("gitee: %w", err)
@@ -182,7 +189,7 @@ func (g *Gitee) lfsPointer(ctx context.Context, repoID, sha string) (oid string,
 	}
 	g.throttle()
 	g.throttle()
-	code, err := getJSON(ctx, g.Client, g.authed(fmt.Sprintf("%s/repos/%s/git/blobs/%s", g.BaseURL, repoID, sha)), "", &blob)
+	_, code, err := getJSON(ctx, g.Client, g.authed(fmt.Sprintf("%s/repos/%s/git/blobs/%s", g.BaseURL, repoID, sha)), "", &blob)
 	g.backOff(code)
 	if err != nil || code != http.StatusOK {
 		return "", 0, false

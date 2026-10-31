@@ -12,7 +12,7 @@
     "content_baseline": "docs/demo-results.json",
     "demo_source": "docs/demo-results.json",
     "content_version": "1",
-    "source_version": "v0.1.0"
+    "source_version": "v0.2.0"
   },
   "hero": {
     "eyebrow": {

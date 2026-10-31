@@ -35,7 +35,7 @@ func (h *HuggingFace) Snapshot(ctx context.Context, repoID string) (state.Regist
 	var meta struct {
 		Sha string `json:"sha"`
 	}
-	code, err := getJSON(ctx, h.Client, h.BaseURL+"/api/models/"+repoID, h.Token, &meta)
+	_, code, err := getJSON(ctx, h.Client, h.BaseURL+"/api/models/"+repoID, h.Token, &meta)
 	if err != nil {
 		return st, fmt.Errorf("huggingface: %w", err)
 	}
@@ -47,13 +47,23 @@ func (h *HuggingFace) Snapshot(ctx context.Context, repoID string) (state.Regist
 		return st, fmt.Errorf("huggingface: unexpected HTTP %d fetching %s", code, repoID)
 	}
 
+	// The tree API pages at 1000 entries and advertises the next page with a
+	// Link rel="next" header. Follow the cursor until the listing ends so a
+	// repo larger than one page is recorded in full; a failure mid-listing
+	// surfaces as an error row instead of a silently partial snapshot.
 	var tree []hfTreeEntry
-	code, err = getJSON(ctx, h.Client, h.BaseURL+"/api/models/"+repoID+"/tree/"+meta.Sha+"?recursive=true", h.Token, &tree)
-	if err != nil {
-		return st, fmt.Errorf("huggingface: %w", err)
-	}
-	if code != http.StatusOK {
-		return st, fmt.Errorf("huggingface: unexpected HTTP %d fetching the file tree of %s", code, repoID)
+	pageURL := h.BaseURL + "/api/models/" + repoID + "/tree/" + meta.Sha + "?recursive=true"
+	for pageURL != "" {
+		var page []hfTreeEntry
+		next, code, err := getJSON(ctx, h.Client, pageURL, h.Token, &page)
+		if err != nil {
+			return st, fmt.Errorf("huggingface: %w", err)
+		}
+		if code != http.StatusOK {
+			return st, fmt.Errorf("huggingface: unexpected HTTP %d fetching the file tree of %s", code, repoID)
+		}
+		tree = append(tree, page...)
+		pageURL = next
 	}
 
 	st.Present = true

@@ -76,6 +76,26 @@ func TestGiteeMissingRepoIsAbsent(t *testing.T) {
 	}
 }
 
+func TestGiteeRejectedTokenIsAnError(t *testing.T) {
+	// On Gitee, 401 means the access token was rejected (a live public repo
+	// answers 200 anonymously, 401 with a bogus token) — not that the repo is
+	// gone. Reporting it as "absent" would silently turn every watched repo
+	// into a phantom takedown whenever GITEE_TOKEN is stale.
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusUnauthorized)
+	}))
+	defer srv.Close()
+
+	g := &Gitee{BaseURL: srv.URL, Client: srv.Client()}
+	st, err := g.Snapshot(context.Background(), "hf-models/DeepSeek-V3.1")
+	if err == nil {
+		t.Fatalf("401 must be an error row, got state %+v", st)
+	}
+	if !strings.Contains(err.Error(), "401") || !strings.Contains(err.Error(), "GITEE_TOKEN") {
+		t.Fatalf("error should name the rejected token: %v", err)
+	}
+}
+
 func TestGiteeTruncatedTreeIsAnError(t *testing.T) {
 	mux := http.NewServeMux()
 	srv := httptest.NewServer(mux)

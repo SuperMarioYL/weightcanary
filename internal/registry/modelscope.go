@@ -41,7 +41,7 @@ func (m *ModelScope) Snapshot(ctx context.Context, repoID string) (state.Registr
 		} `json:"Data"`
 	}
 	url := m.BaseURL + "/api/v1/models/" + repoID + "/repo/files?Revision=master&Root=&Recursive=true"
-	code, err := getJSON(ctx, m.Client, url, "", &page)
+	_, code, err := getJSON(ctx, m.Client, url, "", &page)
 	if err != nil {
 		return st, fmt.Errorf("modelscope: %w", err)
 	}

@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/SuperMarioYL/weightcanary/internal/state"
@@ -44,11 +45,14 @@ func newHTTPClient() *http.Client {
 
 // getJSON fetches url and decodes the JSON body into out. It returns the HTTP
 // status code so callers can classify "absent" responses (401/404 on some
-// registries) separately from transport errors.
-func getJSON(ctx context.Context, client *http.Client, url string, token string, out any) (int, error) {
+// registries) separately from transport errors. When the response advertises a
+// continuation (a Link rel="next" header — the Hugging Face tree API paginates
+// this way), the absolute URL of the next page is returned so the caller can
+// read the whole listing.
+func getJSON(ctx context.Context, client *http.Client, url string, token string, out any) (next string, code int, err error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return 0, err
+		return "", 0, err
 	}
 	req.Header.Set("User-Agent", "weightcanary")
 	if token != "" {
@@ -56,15 +60,32 @@ func getJSON(ctx context.Context, client *http.Client, url string, token string,
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		return 0, err
+		return "", 0, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusOK && out != nil {
 		if err := json.NewDecoder(resp.Body).Decode(out); err != nil {
-			return resp.StatusCode, fmt.Errorf("decode %s: %w", url, err)
+			return "", resp.StatusCode, fmt.Errorf("decode %s: %w", url, err)
 		}
-		return resp.StatusCode, nil
+		return nextPageLink(resp.Header.Get("Link")), resp.StatusCode, nil
 	}
 	_, _ = io.Copy(io.Discard, resp.Body)
-	return resp.StatusCode, nil
+	return "", resp.StatusCode, nil
+}
+
+// nextPageLink extracts the URL of the next page from an RFC 5988 Link header
+// ("<url>; rel=\"next\"", possibly among several targets), or "" when the
+// listing ends here.
+func nextPageLink(header string) string {
+	for _, part := range strings.Split(header, ",") {
+		part = strings.TrimSpace(part)
+		if !strings.Contains(part, `rel="next"`) {
+			continue
+		}
+		start, end := strings.Index(part, "<"), strings.Index(part, ">")
+		if start != -1 && end > start {
+			return part[start+1 : end]
+		}
+	}
+	return ""
 }
